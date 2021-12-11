@@ -12,6 +12,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/PlayerBehaviour.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/EventManager.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="228LKJt4xRVV2ih04kvF1maYGH7" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -59,7 +60,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1639214205532</updated>
-      <workItem from="1639214212594" duration="2854000" />
+      <workItem from="1639214212594" duration="5610000" />
     </task>
     <servers />
   </component>

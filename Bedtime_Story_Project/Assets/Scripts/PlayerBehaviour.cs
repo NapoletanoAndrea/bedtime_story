@@ -68,6 +68,7 @@ public class PlayerBehaviour : MonoBehaviour {
     private void DisableMovement() {
         Debug.Log("Disabled");
         InputReader.movementEvent -= OnMove;
+        direction = Vector3.zero;
     }
 
     private void OnDisable() {
