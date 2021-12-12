@@ -168,6 +168,7 @@ public class PlayerBehaviour : MonoBehaviour {
             projectile.Shoot(transform.forward);
             hasLight = false;
             ChangeAnimationState(3);
+            EventManager.Instance.OnDarkness();
         }
     }
 
@@ -200,6 +201,10 @@ public class PlayerBehaviour : MonoBehaviour {
 
     private void OnDisable() {
         InputReader.movementEvent -= OnMove;
+        InputReader.dashEvent -= Dash;
+        InputReader.aimPressedEvent -= DisableMovement;
+        InputReader.aimEvent -= Aim;
+        InputReader.aimReleasedEvent -= EnableMovement;
     }
 
     private void ChangeAnimationState(int stateNumber) {
@@ -215,6 +220,7 @@ public class PlayerBehaviour : MonoBehaviour {
         if (proj != null) {
             proj.Reallocate(transform);
             hasLight = true;
+            EventManager.Instance.OnDarknessBanished();
         }
     }
 
