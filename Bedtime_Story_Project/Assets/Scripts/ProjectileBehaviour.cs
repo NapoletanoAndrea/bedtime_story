@@ -45,5 +45,7 @@ public class ProjectileBehaviour : MonoBehaviour {
 		if (lightInteractable != null) {
 			lightInteractable.LightInteract();
 		}
+
+		rb.velocity = Vector3.zero;
 	}
 }
