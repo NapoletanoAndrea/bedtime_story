@@ -9,12 +9,16 @@ public class PlayerBehaviour : MonoBehaviour {
     private Rigidbody rb;
     private Animator animator;
     private int currentAnimationState = -1;
+    private bool hasLight = true;
 
     [SerializeField] private ProjectileBehaviour projectile;
+    [SerializeField] private Transform looker;
     [SerializeField] private InputReaderSO InputReader;
     [SerializeField] private float speed;
-    [SerializeField] private float dashTime;
+    [SerializeField] private float dashSeconds;
     [SerializeField] private float dashDistance;
+    [SerializeField] private float rollSeconds;
+    [SerializeField] private float rollDistance;
     [SerializeField] private float turnSmoothTime;
     private float turnSmoothVelocity;
     
@@ -54,32 +58,117 @@ public class PlayerBehaviour : MonoBehaviour {
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
         }
+        
+        ChangeAnimationState(direction.magnitude > .1f ? 1 : 0);
     }
 
     private void Aim() {
         Debug.Log("Aiming...");
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100))
+        if (Physics.Raycast(ray, out hit, 100, LayerMask.GetMask("Ground")))
         {
-            transform.LookAt(hit.point);
+            looker.LookAt(hit.point);
+            Quaternion rotation = looker.rotation;
+            transform.rotation = new Quaternion(0, rotation.y, 0, rotation.w);
         }
+        
+        ChangeAnimationState(2);
     }
 
     private void Dash() {
-        //transform.position = transform.position + direction.normalized * dashDistance;
-        rb.MovePosition(rb.position + direction.normalized * dashDistance * Time.fixedDeltaTime);
+        if (hasLight) {
+            StartCoroutine(DashCoroutine());
+            return;
+        }
+        StartCoroutine(RollCoroutine());
     }
 
     private IEnumerator DashCoroutine() {
+        Vector3 dashDirection = direction;
+        
+        DisableMovement();
         DisableAim();
-        yield return new WaitForSeconds(dashTime);
+        
+        ChangeAnimationState(4);
+        
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = startPosition + dashDirection.normalized * dashDistance;
+
+        Vector3 stopPosition = Vector3.positiveInfinity;
+        
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up, dashDirection.normalized, out hit, dashDistance + 10)) {
+            stopPosition = hit.point;
+            Debug.Log(hit.point);
+        }
+        
+        float count = 0;
+        float t = 0;
+        
+        while (count <= dashSeconds) {
+            count += Time.fixedDeltaTime;
+            t += Time.fixedDeltaTime / dashSeconds;
+            rb.MovePosition(Vector3.Lerp(startPosition, endPosition, t));
+
+            if (Vector3.Distance(transform.position + Vector3.up, stopPosition) <= .5f) {
+                Debug.Log("Break");
+                break;
+            }
+            
+            yield return new WaitForFixedUpdate();
+        }
+        
         EnableAim();
+        EnableMovement();
+    }
+
+    private IEnumerator RollCoroutine() {
+        Vector3 rollDirection = direction;
+        
+        DisableMovement();
+        DisableAim();
+        
+        ChangeAnimationState(5);
+        
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = startPosition + rollDirection.normalized * rollDistance;
+
+        Vector3 stopPosition = Vector3.positiveInfinity;
+        
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up, rollDirection.normalized, out hit, rollDistance + 10)) {
+            stopPosition = hit.point;
+            Debug.Log(hit.point);
+        }
+        
+        float count = 0;
+        float t = 0;
+        
+        while (count <= rollSeconds) {
+            count += Time.fixedDeltaTime;
+            t += Time.fixedDeltaTime / rollSeconds;
+            rb.MovePosition(Vector3.Lerp(startPosition, endPosition, t));
+
+            if (Vector3.Distance(transform.position + Vector3.up, stopPosition) <= .5f) {
+                Debug.Log("Break");
+                break;
+            }
+            
+            yield return new WaitForFixedUpdate();
+        }
+        
+        EnableAim();
+        EnableMovement();
     }
 
     private void Shoot() {
         Debug.Log("Shot");
-        projectile.Shoot(transform.forward);
+        if (hasLight) {
+            projectile.Shoot(transform.forward);
+            hasLight = false;
+            ChangeAnimationState(3);
+        }
     }
 
     private void EnableMovement() {
@@ -113,10 +202,23 @@ public class PlayerBehaviour : MonoBehaviour {
         InputReader.movementEvent -= OnMove;
     }
 
+    private void ChangeAnimationState(int stateNumber) {
+        if (currentAnimationState == stateNumber) {
+            return;
+        }
+        animator.SetInteger(State, stateNumber);
+        currentAnimationState = stateNumber;
+    }
+
     private void OnCollisionEnter(Collision other) {
         var proj = other.gameObject.GetComponent<ProjectileBehaviour>();
         if (proj != null) {
             proj.Reallocate(transform);
+            hasLight = true;
         }
+    }
+
+    private void OnDrawGizmos() {
+        Gizmos.DrawRay(transform.position + Vector3.up, direction * 100);
     }
 }

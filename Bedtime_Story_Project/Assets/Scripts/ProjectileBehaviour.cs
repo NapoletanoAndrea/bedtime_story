@@ -40,5 +40,10 @@ public class ProjectileBehaviour : MonoBehaviour {
 		}
 		rb.useGravity = true;
 		gameObject.layer = 0;
+
+		ILightInteractable lightInteractable = other.gameObject.GetComponent<ILightInteractable>();
+		if (lightInteractable != null) {
+			lightInteractable.LightInteract();
+		}
 	}
 }
