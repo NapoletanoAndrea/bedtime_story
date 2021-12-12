@@ -14,6 +14,7 @@ public class InputReaderSO : ScriptableObject {
     public UnityAction aimPressedEvent;
     public UnityAction aimEvent;
     public UnityAction aimReleasedEvent;
+    public UnityAction shootPressedEvent;
 
     public void OnMove() {
         movementEvent?.Invoke(new Vector2(Input.GetAxisRaw(horizontalAxisString), Input.GetAxisRaw(verticalAxisString)));
@@ -40,6 +41,12 @@ public class InputReaderSO : ScriptableObject {
     public void OnAimReleased() {
         if (Input.GetMouseButtonUp(1)) {
             aimReleasedEvent?.Invoke();
+        }
+    }
+
+    public void OnShootPressed() {
+        if (Input.GetMouseButtonDown(0)) {
+            shootPressedEvent?.Invoke();
         }
     }
 }

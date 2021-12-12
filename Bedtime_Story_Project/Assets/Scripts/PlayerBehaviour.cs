@@ -9,9 +9,12 @@ public class PlayerBehaviour : MonoBehaviour {
     private Rigidbody rb;
     private Animator animator;
     private int currentAnimationState = -1;
-    
+
+    [SerializeField] private ProjectileBehaviour projectile;
     [SerializeField] private InputReaderSO InputReader;
     [SerializeField] private float speed;
+    [SerializeField] private float dashTime;
+    [SerializeField] private float dashDistance;
     [SerializeField] private float turnSmoothTime;
     private float turnSmoothVelocity;
     
@@ -23,6 +26,7 @@ public class PlayerBehaviour : MonoBehaviour {
         animator = GetComponent<Animator>();
         
         InputReader.movementEvent += OnMove;
+        InputReader.dashEvent += Dash;
         InputReader.aimPressedEvent += DisableMovement;
         InputReader.aimEvent += Aim;
         InputReader.aimReleasedEvent += EnableMovement;
@@ -30,9 +34,11 @@ public class PlayerBehaviour : MonoBehaviour {
 
     private void Update() {
         InputReader.OnMove();
+        InputReader.OnDashKeyPressed();
         InputReader.OnAimPressed();
         InputReader.OnAim();
         InputReader.OnAimReleased();
+        InputReader.OnShootPressed();
     }
 
     private void FixedUpdate() {
@@ -60,18 +66,57 @@ public class PlayerBehaviour : MonoBehaviour {
         }
     }
 
+    private void Dash() {
+        //transform.position = transform.position + direction.normalized * dashDistance;
+        rb.MovePosition(rb.position + direction.normalized * dashDistance * Time.fixedDeltaTime);
+    }
+
+    private IEnumerator DashCoroutine() {
+        DisableAim();
+        yield return new WaitForSeconds(dashTime);
+        EnableAim();
+    }
+
+    private void Shoot() {
+        Debug.Log("Shot");
+        projectile.Shoot(transform.forward);
+    }
+
     private void EnableMovement() {
         Debug.Log("Enabled");
         InputReader.movementEvent += OnMove;
+        InputReader.shootPressedEvent -= Shoot;
+        InputReader.dashEvent += Dash;
     }
 
     private void DisableMovement() {
         Debug.Log("Disabled");
         InputReader.movementEvent -= OnMove;
+        InputReader.shootPressedEvent += Shoot;
+        InputReader.dashEvent -= Dash;
         direction = Vector3.zero;
+    }
+
+    private void DisableAim() {
+        InputReader.aimPressedEvent -= EnableMovement;
+        InputReader.aimEvent -= Aim;
+        InputReader.aimReleasedEvent -= DisableMovement;
+    }
+
+    private void EnableAim() {
+        InputReader.aimPressedEvent += EnableMovement;
+        InputReader.aimEvent += Aim;
+        InputReader.aimReleasedEvent += DisableMovement;
     }
 
     private void OnDisable() {
         InputReader.movementEvent -= OnMove;
+    }
+
+    private void OnCollisionEnter(Collision other) {
+        var proj = other.gameObject.GetComponent<ProjectileBehaviour>();
+        if (proj != null) {
+            proj.Reallocate(transform);
+        }
     }
 }
