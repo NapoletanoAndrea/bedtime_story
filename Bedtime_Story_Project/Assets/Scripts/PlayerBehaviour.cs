@@ -38,6 +38,7 @@ public class PlayerBehaviour : MonoBehaviour {
 
     private void Update() {
         InputReader.OnMove();
+        InputReader.OnInteractionKeyPressed();
         InputReader.OnDashKeyPressed();
         InputReader.OnAimPressed();
         InputReader.OnAim();

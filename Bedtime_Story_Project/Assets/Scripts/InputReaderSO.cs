@@ -7,9 +7,11 @@ using UnityEngine.Events;
 public class InputReaderSO : ScriptableObject {
     [SerializeField] private string horizontalAxisString;
     [SerializeField] private string verticalAxisString;
+    [SerializeField] private KeyCode interactionKey;
     [SerializeField] private KeyCode dashKey;
 
     public UnityAction<Vector2> movementEvent;
+    public UnityAction interactEvent;
     public UnityAction dashEvent;
     public UnityAction aimPressedEvent;
     public UnityAction aimEvent;
@@ -18,6 +20,12 @@ public class InputReaderSO : ScriptableObject {
 
     public void OnMove() {
         movementEvent?.Invoke(new Vector2(Input.GetAxisRaw(horizontalAxisString), Input.GetAxisRaw(verticalAxisString)));
+    }
+
+    public void OnInteractionKeyPressed() {
+        if (Input.GetKeyDown(interactionKey)) {
+            interactEvent?.Invoke();
+        }
     }
 
     public void OnDashKeyPressed() {
