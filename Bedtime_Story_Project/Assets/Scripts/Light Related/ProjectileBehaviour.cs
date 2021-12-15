@@ -7,14 +7,20 @@ public class ProjectileBehaviour : MonoBehaviour {
 	[SerializeField] private float power;
 	[SerializeField] private float range;
 	private Rigidbody rb;
+	private Transform parent;
 	private Vector3 startPosition;
 	private Vector3 startShootPosition;
 	private bool isPartOfPlayer;
 
 	private void Awake() {
 		rb = GetComponent<Rigidbody>();
+		parent = transform.parent;
 		isPartOfPlayer = true;
 		startPosition = transform.localPosition;
+	}
+
+	private void Start() {
+		EventManager.Instance.deathEvent += Reallocate;
 	}
 
 	public void Shoot(Vector3 direction) {
@@ -39,7 +45,11 @@ public class ProjectileBehaviour : MonoBehaviour {
 		rb.velocity = Vector3.zero;
 	}
 
-	public void Reallocate(Transform parent) {
+	public void Reallocate() {
+		if (isPartOfPlayer) {
+			return;
+		}
+		
 		isPartOfPlayer = true;
 		gameObject.layer = 8;
 		rb.useGravity = false;

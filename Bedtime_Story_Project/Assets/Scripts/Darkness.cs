@@ -61,7 +61,7 @@ public class Darkness : MonoBehaviour {
 			yield return null;
 		}
 
-		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+		EventManager.Instance.OnDeath();
 	}
 
 	private void StopCountdown() {

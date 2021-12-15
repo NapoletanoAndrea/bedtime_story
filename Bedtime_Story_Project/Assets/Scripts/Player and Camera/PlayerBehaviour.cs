@@ -241,7 +241,7 @@ public class PlayerBehaviour : MonoBehaviour {
     private void OnCollisionEnter(Collision other) {
         var proj = other.gameObject.GetComponent<ProjectileBehaviour>();
         if (proj != null) {
-            proj.Reallocate(transform);
+            proj.Reallocate();
             hasLight = true;
             EventManager.Instance.OnDarknessBanished();
         }
