@@ -36,6 +36,15 @@ public class PlayerBehaviour : MonoBehaviour {
         InputReader.aimReleasedEvent += EnableMovement;
     }
 
+    private void Start() {
+        EventManager.Instance.deathEvent += DisableMovement;
+        EventManager.Instance.deathEvent += DisableAim;
+        EventManager.Instance.deathEvent += DieAnimation;
+
+        EventManager.Instance.getUpEvent += EnableMovement;
+        EventManager.Instance.getUpEvent += EnableAim;
+    }
+
     private void Update() {
         InputReader.OnMove();
         InputReader.OnInteractionKeyPressed();
@@ -171,6 +180,19 @@ public class PlayerBehaviour : MonoBehaviour {
             ChangeAnimationState(3);
             EventManager.Instance.OnDarkness();
         }
+    }
+
+    private void DieAnimation() {
+        ChangeAnimationState(7);
+        StartCoroutine(GetUpCoroutine());
+    }
+
+    private IEnumerator GetUpCoroutine() {
+        yield return new WaitForSeconds(1);
+        transform.position = EventManager.Instance.checkPosition;
+        ChangeAnimationState(6);
+        yield return new WaitForSeconds(7.35f);
+        EventManager.Instance.OnGettingUp();
     }
 
     private void EnableMovement() {

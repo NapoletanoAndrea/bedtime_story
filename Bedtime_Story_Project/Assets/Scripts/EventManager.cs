@@ -6,12 +6,16 @@ using UnityEngine.Events;
 
 public class EventManager : MonoBehaviour {
     public static EventManager Instance;
+
+    public Vector3 checkPosition;
     
     //Lista di UnityActions... (deathEvent, darknessEvent)
 
     public UnityAction darknessEvent;
     public UnityAction darknessBanishedEvent;
-    private UnityAction darkEnteredEvent;
+    public UnityAction darkEnteredEvent;
+    public UnityAction deathEvent;
+    public UnityAction getUpEvent;
 
     private void Awake() {
         Instance = this;
@@ -29,5 +33,13 @@ public class EventManager : MonoBehaviour {
 
     public void OnDarkEntered() {
         darkEnteredEvent?.Invoke();
+    }
+
+    public void OnDeath() {
+        deathEvent?.Invoke();
+    }
+
+    public void OnGettingUp() {
+        getUpEvent?.Invoke();
     }
 }
