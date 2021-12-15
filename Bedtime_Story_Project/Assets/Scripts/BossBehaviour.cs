@@ -14,9 +14,13 @@ public class BossBehaviour : MonoBehaviour
     private int targetWaypointIndex = 0;
     private float minDistance = 0.1f; //If the distance between the enemy and the waypoint is less than this, then it has reacehd the waypoint
     private int lastWaypointIndex;
+    private int waypointCheck;
 
-    [SerializeField] float movementSpeed = 10.0f;
-    [SerializeField] float rotationSpeed = 3.0f;
+    [SerializeField] public float movementSpeed;
+    [SerializeField] public float rotationSpeed;
+    [SerializeField] public int waypointsCounter;
+    [SerializeField] public float timer = 0.0f;
+    [SerializeField] public float timeStop;
 
 	// Use this for initialization
 	void Start () {
@@ -30,15 +34,19 @@ public class BossBehaviour : MonoBehaviour
         float rotationStep = rotationSpeed * Time.deltaTime;
 
         Vector3 directionToTarget = targetWaypoint.position - transform.position;
-        Quaternion rotationToTarget = Quaternion.LookRotation(directionToTarget); 
+        //Quaternion rotationToTarget = Quaternion.LookRotation(directionToTarget); 
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotationToTarget, rotationStep);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, rotationToTarget, rotationStep);
 
+        transform.Rotate(Vector3.up,rotationStep);
+        
         float distance = Vector3.Distance(transform.position, targetWaypoint.position);
         CheckDistanceToWaypoint(distance);
 
         transform.position = Vector3.MoveTowards(transform.position, targetWaypoint.position, movementStep);
-	}
+
+        Stop();
+    }
 
     /// <summary>
     /// Checks to see if the enemy is within distance of the waypoint. If it is, it called the UpdateTargetWaypoint function 
@@ -63,7 +71,25 @@ public class BossBehaviour : MonoBehaviour
             targetWaypointIndex = 0;
         }
 
+        waypointCheck++;
+
         targetWaypoint = waypoints[targetWaypointIndex];
+    }
+
+    void Stop ()
+    {
+        if (waypointCheck == waypointsCounter)
+        {
+            movementSpeed = 0;
+            timer += Time.deltaTime;
+            if (timer>= timeStop)
+            {
+                movementSpeed = 10;
+                waypointsCounter = 0;
+            }
+            
+        }
+        timer = 0;
     }
 
 }

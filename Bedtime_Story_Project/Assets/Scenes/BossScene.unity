@@ -397,7 +397,10 @@ MonoBehaviour:
   - {fileID: 183842981}
   - {fileID: 582732940}
   movementSpeed: 10
-  rotationSpeed: 10
+  rotationSpeed: 60
+  waypointsCounter: 5
+  timer: 0
+  timeStop: 5
 --- !u!114 &563130560 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5595044470832941214, guid: b62f04b8a95167e438491a886026d9f6, type: 3}
