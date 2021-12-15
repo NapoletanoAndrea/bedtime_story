@@ -9,7 +9,7 @@ public class PlayerBehaviour : MonoBehaviour {
     private Rigidbody rb;
     private Animator animator;
     private int currentAnimationState = -1;
-    private bool hasLight = true;
+    public bool hasLight = true;
 
     [SerializeField] private ProjectileBehaviour projectile;
     [SerializeField] private Transform looker;
@@ -112,7 +112,7 @@ public class PlayerBehaviour : MonoBehaviour {
             t += Time.fixedDeltaTime / dashSeconds;
             rb.MovePosition(Vector3.Lerp(startPosition, endPosition, t));
 
-            if (Vector3.Distance(transform.position + Vector3.up, stopPosition) <= .5f) {
+            if (Vector3.Distance(transform.position + Vector3.up, stopPosition) <= .75f) {
                 Debug.Log("Break");
                 break;
             }

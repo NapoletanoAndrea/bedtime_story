@@ -438,6 +438,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d20c599aa94e3848b14501417cb55c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hasLight: 1
   projectile: {fileID: 1990118190041523877}
   looker: {fileID: 1990118189949181946}
   InputReader: {fileID: 11400000, guid: 2491570afe79b7244b0fc43eeb8c2fb3, type: 2}
@@ -2597,3 +2598,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   power: 15
+  range: 5

@@ -7,17 +7,45 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Darkness : MonoBehaviour {
+	[SerializeField] private Light directionalLight;
+	[SerializeField] private float lightChangeSeconds;
 	[SerializeField] private float deathSeconds;
 	[SerializeField] private Slider lightSlider;
 	private float count;
-	
-	private void Start() {
+
+	private void Awake() {
 		lightSlider.minValue = 0;
 		lightSlider.maxValue = deathSeconds;
 		lightSlider.value = deathSeconds;
+	}
 
+	public void EnableDarknessEvents() {
 		EventManager.Instance.darknessEvent += StartCountdown;
 		EventManager.Instance.darknessBanishedEvent += StopCountdown;
+		StartCoroutine(ChangeLightIntensityCoroutine(.1f));
+	}
+
+	public void DisableDarknessEvents() {
+		EventManager.Instance.darknessEvent += StartCountdown;
+		EventManager.Instance.darknessBanishedEvent += StopCountdown;
+		StartCoroutine(ChangeLightIntensityCoroutine(1f));
+	}
+	
+	private IEnumerator ChangeLightIntensityCoroutine(float targetIntensity) {
+		float c = 0;
+		float t = 0;
+
+		float startIntensity = directionalLight.intensity;
+        
+		while (c <= lightChangeSeconds)
+		{
+			c += Time.deltaTime;
+			t += Time.deltaTime / lightChangeSeconds;
+			directionalLight.intensity = Mathf.Lerp(startIntensity, targetIntensity, t);
+			yield return null;
+		}
+
+		directionalLight.intensity = targetIntensity;
 	}
 
 	private void StartCountdown() {

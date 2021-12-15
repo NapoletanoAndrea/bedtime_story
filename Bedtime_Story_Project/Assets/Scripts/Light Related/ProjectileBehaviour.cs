@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class ProjectileBehaviour : MonoBehaviour {
 	[SerializeField] private float power;
+	[SerializeField] private float range;
 	private Rigidbody rb;
 	private Vector3 startPosition;
+	private Vector3 startShootPosition;
 	private bool isPartOfPlayer;
 
 	private void Awake() {
@@ -20,9 +22,21 @@ public class ProjectileBehaviour : MonoBehaviour {
 			return;
 		}
 		transform.parent = null;
+		startShootPosition = transform.position;
 		isPartOfPlayer = false;
 		rb.constraints = RigidbodyConstraints.None;
 		rb.AddForce(direction * power, ForceMode.Impulse);
+		StartCoroutine(CheckRangeCoroutine());
+	}
+
+	private IEnumerator CheckRangeCoroutine() {
+		while (Vector3.Distance(startShootPosition, transform.position) < range) {
+			yield return null;
+		}
+		Debug.Log("Stopped");
+		rb.useGravity = true;
+		gameObject.layer = 0;
+		rb.velocity = Vector3.zero;
 	}
 
 	public void Reallocate(Transform parent) {
@@ -35,16 +49,23 @@ public class ProjectileBehaviour : MonoBehaviour {
 	}
 
 	private void OnCollisionEnter(Collision other) {
-		if (isPartOfPlayer) {
-			return;
-		}
-		rb.useGravity = true;
-		gameObject.layer = 0;
-
 		ILightInteractable lightInteractable = other.gameObject.GetComponent<ILightInteractable>();
 		if (lightInteractable != null) {
 			lightInteractable.LightInteract();
 		}
+		
+		if (isPartOfPlayer) {
+			return;
+		}
+		
+		ILightShotInteractable lightShotInteractable = other.gameObject.GetComponent<ILightShotInteractable>();
+		if (lightShotInteractable != null) {
+			lightShotInteractable.LightShotInteract();
+		}
+		
+		StopAllCoroutines();
+		rb.useGravity = true;
+		gameObject.layer = 0;
 
 		rb.velocity = Vector3.zero;
 	}

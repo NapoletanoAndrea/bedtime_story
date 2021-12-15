@@ -11,6 +11,7 @@ public class EventManager : MonoBehaviour {
 
     public UnityAction darknessEvent;
     public UnityAction darknessBanishedEvent;
+    private UnityAction darkEnteredEvent;
 
     private void Awake() {
         Instance = this;
@@ -24,5 +25,9 @@ public class EventManager : MonoBehaviour {
 
     public void OnDarknessBanished() {
         darknessBanishedEvent?.Invoke();
+    }
+
+    public void OnDarkEntered() {
+        darkEnteredEvent?.Invoke();
     }
 }

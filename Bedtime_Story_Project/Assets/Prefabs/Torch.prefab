@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1050599512367332303}
   - component: {fileID: 1050599512367332302}
   - component: {fileID: 1050599512367332298}
+  - component: {fileID: 8046729414399167159}
   m_Layer: 0
   m_Name: Torch
   m_TagString: Untagged
@@ -111,6 +112,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lightAnimator: {fileID: 1050599513387703466}
+  lightTrigger: {fileID: 8046729414399167159}
+--- !u!135 &8046729414399167159
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050599512367332301}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 2.836229
+  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &1050599513387703464
 GameObject:
   m_ObjectHideFlags: 0
