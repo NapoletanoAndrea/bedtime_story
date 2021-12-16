@@ -41,7 +41,7 @@ public class ProjectileBehaviour : MonoBehaviour {
 		}
 		Debug.Log("Stopped");
 		rb.useGravity = true;
-		gameObject.layer = 0;
+		gameObject.layer = 7;
 		rb.velocity = Vector3.zero;
 	}
 
@@ -71,12 +71,30 @@ public class ProjectileBehaviour : MonoBehaviour {
 		ILightShotInteractable lightShotInteractable = other.gameObject.GetComponent<ILightShotInteractable>();
 		if (lightShotInteractable != null) {
 			lightShotInteractable.LightShotInteract();
+			Debug.Log("LightShot");
 		}
 		
 		StopAllCoroutines();
 		rb.useGravity = true;
-		gameObject.layer = 0;
+		gameObject.layer = 7;
 
 		rb.velocity = Vector3.zero;
+	}
+
+	private void OnTriggerEnter(Collider other) {
+		ILightInteractable lightInteractable = other.gameObject.GetComponent<ILightInteractable>();
+		if (lightInteractable != null) {
+			lightInteractable.LightInteract();
+		}
+		
+		if (isPartOfPlayer) {
+			return;
+		}
+		
+		ILightShotInteractable lightShotInteractable = other.gameObject.GetComponent<ILightShotInteractable>();
+		if (lightShotInteractable != null) {
+			lightShotInteractable.LightShotInteract();
+			Debug.Log("LightShot");
+		}
 	}
 }

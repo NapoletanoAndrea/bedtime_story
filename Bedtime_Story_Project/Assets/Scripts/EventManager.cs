@@ -16,6 +16,9 @@ public class EventManager : MonoBehaviour {
     public UnityAction darkEnteredEvent;
     public UnityAction deathEvent;
     public UnityAction getUpEvent;
+    public UnityAction fadedScreenEvent;
+    public UnityAction bossAreaEntered;
+    public UnityAction bossDeathEvent;
 
     private void Awake() {
         Instance = this;
@@ -41,5 +44,17 @@ public class EventManager : MonoBehaviour {
 
     public void OnGettingUp() {
         getUpEvent?.Invoke();
+    }
+
+    public void OnFadedScreen() {
+        fadedScreenEvent?.Invoke();
+    }
+
+    public void OnBossAreaEntered() {
+        bossAreaEntered?.Invoke();
+    }
+
+    public void OnBossDeath() {
+        bossDeathEvent?.Invoke();
     }
 }

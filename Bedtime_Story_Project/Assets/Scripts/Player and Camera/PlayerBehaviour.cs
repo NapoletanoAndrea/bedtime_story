@@ -24,6 +24,9 @@ public class PlayerBehaviour : MonoBehaviour {
     
     private static readonly int State = Animator.StringToHash("State");
 
+    private bool moveEnabled;
+    private bool aimEnabled;
+
     private void Awake() {
         moveCam = Camera.main.transform;
         rb = GetComponent<Rigidbody>();
@@ -34,6 +37,9 @@ public class PlayerBehaviour : MonoBehaviour {
         InputReader.aimPressedEvent += DisableMovement;
         InputReader.aimEvent += Aim;
         InputReader.aimReleasedEvent += EnableMovement;
+
+        moveEnabled = true;
+        aimEnabled = true;
     }
 
     private void Start() {
@@ -60,6 +66,9 @@ public class PlayerBehaviour : MonoBehaviour {
     }
 
     private void OnMove(Vector2 movement) {
+        if (moveCam == null) {
+            moveCam = Camera.main.transform;
+        }
         direction = moveCam.right.normalized * movement.x + moveCam.forward.normalized * movement.y;
         direction.y = 0;
 
@@ -73,7 +82,6 @@ public class PlayerBehaviour : MonoBehaviour {
     }
 
     private void Aim() {
-        Debug.Log("Aiming...");
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100, LayerMask.GetMask("Ground")))
@@ -110,7 +118,7 @@ public class PlayerBehaviour : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(transform.position + Vector3.up, dashDirection.normalized, out hit, dashDistance + 10)) {
             stopPosition = hit.point;
-            Debug.Log(hit.point);
+            Debug.Log(hit.collider.name);
         }
         
         float count = 0;
@@ -121,7 +129,7 @@ public class PlayerBehaviour : MonoBehaviour {
             t += Time.fixedDeltaTime / dashSeconds;
             rb.MovePosition(Vector3.Lerp(startPosition, endPosition, t));
 
-            if (Vector3.Distance(transform.position + Vector3.up, stopPosition) <= .75f) {
+            if (Vector3.Distance(transform.position + Vector3.up, stopPosition) <= 1.5f) {
                 Debug.Log("Break");
                 break;
             }
@@ -149,7 +157,7 @@ public class PlayerBehaviour : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(transform.position + Vector3.up, rollDirection.normalized, out hit, rollDistance + 10)) {
             stopPosition = hit.point;
-            Debug.Log(hit.point);
+            Debug.Log(hit.collider.name);
         }
         
         float count = 0;
@@ -183,12 +191,15 @@ public class PlayerBehaviour : MonoBehaviour {
     }
 
     private void DieAnimation() {
+        hasLight = true;
+        EventManager.Instance.OnDarknessBanished();
         ChangeAnimationState(7);
         StartCoroutine(GetUpCoroutine());
     }
 
     private IEnumerator GetUpCoroutine() {
         yield return new WaitForSeconds(1);
+        EventManager.Instance.OnFadedScreen();
         transform.position = EventManager.Instance.checkPosition;
         ChangeAnimationState(6);
         yield return new WaitForSeconds(7.35f);
@@ -196,30 +207,38 @@ public class PlayerBehaviour : MonoBehaviour {
     }
 
     private void EnableMovement() {
+        if(moveEnabled) return;
         Debug.Log("Enabled");
         InputReader.movementEvent += OnMove;
         InputReader.shootPressedEvent -= Shoot;
         InputReader.dashEvent += Dash;
+        moveEnabled = true;
     }
 
     private void DisableMovement() {
+        if (!moveEnabled) return;
         Debug.Log("Disabled");
         InputReader.movementEvent -= OnMove;
         InputReader.shootPressedEvent += Shoot;
         InputReader.dashEvent -= Dash;
         direction = Vector3.zero;
+        moveEnabled = false;
     }
 
     private void DisableAim() {
-        InputReader.aimPressedEvent -= EnableMovement;
+        if (!aimEnabled) return;
+        InputReader.aimPressedEvent -= DisableMovement;
         InputReader.aimEvent -= Aim;
-        InputReader.aimReleasedEvent -= DisableMovement;
+        InputReader.aimReleasedEvent -= EnableMovement;
+        aimEnabled = false;
     }
 
     private void EnableAim() {
-        InputReader.aimPressedEvent += EnableMovement;
+        if(aimEnabled) return;
+        InputReader.aimPressedEvent += DisableMovement;
         InputReader.aimEvent += Aim;
-        InputReader.aimReleasedEvent += DisableMovement;
+        InputReader.aimReleasedEvent += EnableMovement;
+        aimEnabled = true;
     }
 
     private void OnDisable() {
@@ -228,6 +247,7 @@ public class PlayerBehaviour : MonoBehaviour {
         InputReader.aimPressedEvent -= DisableMovement;
         InputReader.aimEvent -= Aim;
         InputReader.aimReleasedEvent -= EnableMovement;
+        InputReader.shootPressedEvent -= Shoot;
     }
 
     private void ChangeAnimationState(int stateNumber) {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.U2D;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -19,6 +18,10 @@ public class Darkness : MonoBehaviour {
 		lightSlider.value = deathSeconds;
 	}
 
+	private void Start() {
+		EventManager.Instance.bossDeathEvent += DisableDarknessEvents;
+	}
+
 	public void EnableDarknessEvents() {
 		EventManager.Instance.darknessEvent += StartCountdown;
 		EventManager.Instance.darknessBanishedEvent += StopCountdown;
@@ -26,8 +29,9 @@ public class Darkness : MonoBehaviour {
 	}
 
 	public void DisableDarknessEvents() {
-		EventManager.Instance.darknessEvent += StartCountdown;
-		EventManager.Instance.darknessBanishedEvent += StopCountdown;
+		EventManager.Instance.darknessEvent -= StartCountdown;
+		EventManager.Instance.darknessBanishedEvent -= StopCountdown;
+		StopCountdown();
 		StartCoroutine(ChangeLightIntensityCoroutine(1f));
 	}
 	

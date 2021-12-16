@@ -9,7 +9,7 @@ public class FadeScreen : MonoBehaviour
 
     private void Start() {
         EventManager.Instance.deathEvent += DeathFade;
-        EventManager.Instance.deathEvent += GetUpFade;
+        EventManager.Instance.fadedScreenEvent += GetUpFade;
     }
 
     private void DeathFade() {
@@ -17,7 +17,7 @@ public class FadeScreen : MonoBehaviour
     }
 
     private void GetUpFade() {
-        StartCoroutine(FadeTo(fadeImage, 1, 0, 1, 1));
+        StartCoroutine(FadeTo(fadeImage, 1, 0, 1, 0));
     }
 
     private IEnumerator FadeTo(Image image, float startAlpha, float targetAlpha, float seconds, float waitSeconds) {
